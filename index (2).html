@@ -1,0 +1,264 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ProsFire Technologies: AI-powered gunshot detection for safer cities">
+    <meta name="keywords" content="gunshot detection, public safety, AI, police technology">
+    <title>ProsFire Technologies</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script> <!-- Replace with your Font Awesome kit -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .gradient-header {
+            background: linear-gradient(90deg, #4B5EAA, #8B9DC3);
+        }
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .6; }
+        }
+        #dataTable {
+            display: none;
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #dataTable th, #dataTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #dataTable th {
+            background-color: #4B5EAA;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Loading Animation -->
+    <div id="loader" class="animate-spin h-8 w-8 border-4 border-blue-600 rounded-full mx-auto my-10 flex items-center">
+        <span class="ml-2 text-blue-600">Loading...</span>
+    </div>
+
+    <!-- Homepage -->
+    <header class="gradient-header text-white py-8 hidden" id="content">
+        <div class="container mx-auto text-center px-4">
+            <h1 class="text-4xl font-bold">ProsFire Technologies</h1>
+            <p class="text-lg mt-2">Real-Time Gunshot Detection to Make Cities Safer</p>
+            <p class="text-md italic text-gray-100 mt-1">Who Made the Shot?</p>
+            <a href="#rsvp" class="mt-4 inline-block bg-white text-blue-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-200 hover:scale-105 transition-transform duration-300 animate-pulse-slow">Join Our Demo Day: Nov 25, 2025</a>
+        </div>
+    </header>
+
+    <!-- Product Section -->
+    <section class="py-12 hidden" id="content">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Our Solutions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-semibold">Eagle Voice App</h3>
+                    <p class="mt-4">AI-powered mobile app for real-time gunshot alerts, enabling police to respond in seconds with high accuracy.</p>
+                    <img src="https://placehold.co/300x200?text=Eagle+Voice+App" alt="Eagle Voice App" class="mt-4 rounded w-full" onerror="this.style.display='none';">
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-semibold">B-Cry Units</h3>
+                    <p class="mt-4">Compact sensors detecting gunshots in urban environments, designed for seamless integration with our app.</p>
+                    <img src="https://placehold.co/300x200?text=B-Cry+Unit" alt="B-Cry Unit" class="mt-4 rounded w-full" onerror="this.style.display='none';">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="bg-gray-200 py-12 hidden" id="content">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Our Team</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-semibold">Winfred Adepa</h3>
+                    <p class="mt-2">CEO</p>
+                    <p class="mt-2">Driving strategy and partnerships for safer cities through innovative tech.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-semibold">Javier Alejandro</h3>
+                    <p class="mt-2">CTO</p>
+                    <p class="mt-2">12+ years in AI and tech, building cutting-edge gunshot detection solutions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="py-12 bg-gray-100 hidden" id="content">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">What Partners Say</h2>
+            <p class="text-lg italic">"Innovative solution for urban safety" – Anonymous Police Department</p>
+        </div>
+    </section>
+
+    <!-- Demo Day Section with RSVP Form -->
+    <section class="py-12 hidden" id="content" id="rsvp">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Demo Day: November 25, 2025</h2>
+            <p class="text-lg mb-4">Join us in San Francisco to see our gunshot detection solution live. Discover our $600K pre-seed opportunity.</p>
+            <form id="rsvpForm" class="max-w-md mx-auto">
+                <input type="text" name="name" placeholder="Your Name" class="w-full p-2 mb-2 rounded border" required>
+                <input type="email" name="email" placeholder="Your Email" class="w-full p-2 mb-2 rounded border" required>
+                <input type="text" name="organization" placeholder="Organization" class="w-full p-2 mb-2 rounded border" required>
+                <button type="submit" class="w-full bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 hover:scale-105 transition-transform duration-300 animate-pulse-slow">RSVP Now</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="bg-blue-600 text-white py-12 hidden" id="content">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Get in Touch</h2>
+            <p class="mb-4">Contact us for partnerships or investment.</p>
+            <p>Email: <a href="mailto:winfredadepa@prosfiretech.com" class="underline flex items-center justify-center"><i class="fas fa-envelope mr-2"></i>winfredadepa@prosfiretech.com</a></p>
+            <p>Slack: <a href="https://prosfire.slack.com" target="_blank" class="underline flex items-center justify-center"><i class="fab fa-slack mr-2"></i>prosfire.slack.com</a></p>
+            <p>LinkedIn: <a href="https://linkedin.com/company/prosfiretech" target="_blank" class="underline flex items-center justify-center"><i class="fab fa-linkedin mr-2"></i>ProsFire Technologies</a></p>
+        </div>
+    </section>
+
+    <!-- File Upload Section -->
+    <section class="py-12 hidden" id="content">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Upload Contact Data</h2>
+            <p class="mb-4">Upload an Excel file to import contacts (e.g., PDs, VCs).</p>
+            <input type="file" id="fileInput" accept=".xlsx" class="mb-4">
+            <button onclick="uploadFile()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">Upload</button>
+            <table id="dataTable"></table>
+        </div>
+    </section>
+
+    <script>
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+
+                    // Convert sheet to JSON to filter blank rows
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+
+                    // Display as table
+                    var table = document.getElementById('dataTable');
+                    table.innerHTML = '';
+                    table.style.display = 'table';
+                    var headers = filteredData[headerRowIndex];
+                    var headerRow = document.createElement('tr');
+                    headers.forEach(header => {
+                        var th = document.createElement('th');
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    });
+                    table.appendChild(headerRow);
+                    filteredData.slice(headerRowIndex + 1).forEach(row => {
+                        var tr = document.createElement('tr');
+                        row.forEach(cell => {
+                            var td = document.createElement('td');
+                            td.textContent = cell;
+                            tr.appendChild(td);
+                        });
+                        table.appendChild(tr);
+                    });
+                    return XLSX.utils.sheet_to_csv(worksheet, { header: 1 });
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+
+        function uploadFile() {
+            var fileInput = document.getElementById('fileInput');
+            var file = fileInput.files[0];
+            if (file && file.name.endsWith('.xlsx')) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var base64String = btoa(e.target.result);
+                    gk_fileData[file.name] = base64String;
+                    gk_xlsxFileLookup[file.name] = true;
+                    gk_isXlsx = true;
+                    loadFileData(file.name);
+                };
+                reader.readAsBinaryString(file);
+            } else {
+                alert('Please upload a valid .xlsx file.');
+            }
+        }
+
+        // Hide loader and show content after page load
+        window.addEventListener('load', () => {
+            document.getElementById('loader').classList.add('hidden');
+            const contentSections = document.querySelectorAll('#content');
+            contentSections.forEach(section => section.classList.remove('hidden'));
+        });
+    </script>
+</body>
+</html>
